@@ -11,6 +11,7 @@ object DeviceRegistrationManager {
         token: String,
         anonymousUserId: String,
         userId: String,
+        customerId: String,
         deviceId: String?,
         fcmId: String,
         createdAt: String,
@@ -21,7 +22,6 @@ object DeviceRegistrationManager {
         sessionByUser: String,
         expectedSignatureSha256: String
     ): DeviceRegisterResponse? {
-        // Step 1: Collect device info
         val deviceInfo = DeviceInspector.collect(
             context = context,
             anonymousUserId = anonymousUserId,
@@ -35,7 +35,7 @@ object DeviceRegistrationManager {
             sessionByApp = sessionByApp,
             sessionByUser = sessionByUser,
             expectedSignatureSha256 = expectedSignatureSha256,
-            customerId = ""
+            customerId = customerId
         )
 
         val modifiedDeviceInfo = if (deviceId.isNullOrBlank()) {
@@ -45,5 +45,48 @@ object DeviceRegistrationManager {
         }
 
         return DeviceApi.registerDevice(token, modifiedDeviceInfo)
+    }
+
+    suspend fun registerAndSaveDeviceId(
+        context: Context,
+        token: String,
+        anonymousUserId: String,
+        userId: String,
+        deviceId: String?,
+        fcmId: String,
+        createdAt: String,
+        createdByApp: String,
+        createdByUser: String,
+        sessionAt: String,
+        sessionByApp: String,
+        sessionByUser: String,
+        expectedSignatureSha256: String,
+        customerId: String,
+        onNewDeviceId: (String) -> Unit
+    ): DeviceRegisterResponse? {
+        val response = registerDevice(
+            context = context,
+            token = token,
+            anonymousUserId = anonymousUserId,
+            userId = userId,
+            deviceId = deviceId,
+            fcmId = fcmId,
+            createdAt = createdAt,
+            createdByApp = createdByApp,
+            createdByUser = createdByUser,
+            sessionAt = sessionAt,
+            sessionByApp = sessionByApp,
+            sessionByUser = sessionByUser,
+            expectedSignatureSha256 = expectedSignatureSha256,
+            customerId = customerId
+        )
+
+        response?.deviceId?.let { newId ->
+            if (deviceId.isNullOrBlank()) {
+                onNewDeviceId(newId)
+            }
+        }
+
+        return response
     }
 }
