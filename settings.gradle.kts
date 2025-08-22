@@ -20,5 +20,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "KPNDeviceInspector"
-include(":app")
+include(":library")
  
