@@ -1,5 +1,8 @@
 package com.kpn.deviceinspector.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class DeviceRegisterRequest(
     val anonymous_user_id: String,
     val user_id: String,
