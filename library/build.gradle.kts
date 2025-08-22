@@ -48,7 +48,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.kotalSumitKPN"
                 artifactId = "KPNDeviceInspector"
-                version = "v1.0.1"
+                version = "v1.0.2"
             }
         }
     }
