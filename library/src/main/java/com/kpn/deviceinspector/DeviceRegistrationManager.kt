@@ -44,6 +44,8 @@ object DeviceRegistrationManager {
             deviceInfo
         }
 
+        println("Modified Device Info: $modifiedDeviceInfo")
+
         return DeviceApi.registerDevice(token, modifiedDeviceInfo)
     }
 
