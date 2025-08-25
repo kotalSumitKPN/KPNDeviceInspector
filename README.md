@@ -1,15 +1,12 @@
 # KPNDeviceInspector
 
-`KPNDeviceInspector` is an Android library designed to collect advanced device metadata and perform device integrity checks for registration and fraud prevention purposes. It performs detections like emulator use, root, tampering, spoofers, and more.
+`KPNDeviceInspector` is an Android library for advanced device metadata collection and integrity checks. It helps detect tampering, spoofing, emulator use, root access, and more to aid in fraud prevention and secure device registration.
 
 ---
 
 ## 🚀 Installation
 
-The library is hosted on **JitPack**. Follow these steps to integrate it into your Android app.
-
-### Step 1: Add JitPack to your `settings.gradle`
-
+### Step 1: Add JitPack to your `settings.gradle.kts`
 ```kotlin
 pluginManagement {
     repositories {
@@ -29,8 +26,7 @@ dependencyResolutionManagement {
 }
 ```
 
-### Step 2: Add the dependency in your `build.gradle`
-
+### Step 2: Add library dependency to your `build.gradle.kts`
 ```kotlin
 dependencies {
     implementation("com.github.kotalSumitKPN:KPNDeviceInspector:v1.0.0")
@@ -39,9 +35,9 @@ dependencies {
 
 ---
 
-## 📦 How to Use
+## 📦 App-Side Usage
 
-Use the following function to register the device from anywhere in your app (ideally after login or app launch):
+### Direct call (returns response):
 
 ```kotlin
 val response = DeviceRegistrationManager.registerDevice(
@@ -53,102 +49,133 @@ val response = DeviceRegistrationManager.registerDevice(
     deviceId = DEVICE_ID, // nullable
     fcmId = FCM_TOKEN,
     createdAt = ISO_DATE_STRING,
-    createdByApp = "KPN_FRESH",
+    createdByApp = APP_NAME,
     createdByUser = ACTUAL_USER_ID,
     sessionAt = ISO_DATE_STRING,
-    sessionByApp = "KPN_FRESH",
+    sessionByApp = APP_NAME,
     sessionByUser = ACTUAL_USER_ID,
     expectedSignatureSha256 = YOUR_SHA256_SIGNATURE
 )
 ```
 
-The function:
-- Collects full device data
-- Detects tampering, emulator, root, spoofing, etc.
-- Calls the remote API with structured payload
+### Auto-saving `device_id` using a callback:
 
-> You will get back a `DeviceRegisterResponse?`
+```kotlin
+fun registerDevice() {
+    lifecycleScope.launch {
+        DeviceRegistrationManager.registerAndSaveDeviceId(
+            context = applicationContext,
+            token = "YOUR_JWT_TOKEN",
+            anonymousUserId = "UUID_STRING",
+            userId = "USER_ID",
+            deviceId = null,
+            fcmId = "FCM_TOKEN",
+            createdAt = "ISO_DATE",
+            createdByApp = "KPN_FRESH",
+            createdByUser = "USER_ID",
+            sessionAt = "ISO_DATE",
+            sessionByApp = "KPN_FRESH",
+            sessionByUser = "USER_ID",
+            expectedSignatureSha256 = "YOUR_SHA256",
+            customerId = "CUSTOMER_ID",
+            onNewDeviceId = { newId ->
+                println("Saving new Id - $newId")
+            }
+        )
+    }
+}
+```
 
 ---
 
-## 📘 Model: `DeviceRegisterRequest`
+## 🔁 API Response
 
-Each key in the request is crafted for both analytics and fraud detection.
+The library returns:
+
+```json
+{
+  "device_id": "d385b303-9abf-5870-87c7-f9e8f083adff"
+}
+```
+
+This `device_id` must be saved and reused for future sessions.
+
+---
+
+## 📘 DeviceRegisterRequest – Field-by-Field
 
 | Field | Description |
 |-------|-------------|
-| `anonymous_user_id` | UUID to identify guest users |
-| `user_id` | Authenticated user ID |
-| `device_id` | App or Firebase Installation ID |
-| `customer_id` | Backend user/account/customer reference |
-| `platform` | Always `"AND"` for Android |
-| `fcm_id` | Firebase Cloud Messaging token |
-| `created_at`, `created_by_app`, `created_by_user` | Metadata for creation |
-| `session_at`, `session_by_app`, `session_by_user` | Metadata for last session |
-| `brand`, `model`, `manufacturer`, `hardware`, `board`, `android_build`, `security_patch`, `os_version` | Device info |
-| `display_type`, `screen_size`, `app_bundle_name`, `java_version`, `user_agent` | App & environment |
-| `android_id` | Secure Android ID |
-| `carrier`, `wifi_enabled`, `wifi_ssid` | Network info |
-| `battery_level` | Battery % |
-| `user_language`, `user_region` | Locale info |
-| `is_app_tampered` | Signature mismatch |
-| `is_auto_clicker_enabled` | Known auto clicker APKs installed |
-| `is_developer_option_enabled`, `is_debugging_enabled` | Developer options check |
-| `is_hooking` | Frida/Substrate detection |
-| `is_device_masked` | Checks if device is pretending to be another |
-| `is_emulator` | AVD detection |
-| `is_jail_broken` | Root detection |
-| `is_running_clone_app` | Cloning/Multi-app detected |
-| `is_running_gps_spoofer` | Mock GPS enabled |
-| `is_running_screen_sharing` | Screen sharing active |
-| `is_running_vpn_spoofers` | VPN active |
-| `is_secondary_user` | Secondary user profile (guest/multi-user) |
-| `is_suspicious_factory_reset` | Factory reset detected in last 24 hours |
-| `is_virtual_os` | VM or virtualized environment |
-| `is_request_payload_tampered` | Attempts to modify request payload |
+| `anonymous_user_id` | UUID for guest session |
+| `user_id` | Logged-in user ID |
+| `device_id` | Firebase/App Installation ID |
+| `customer_id` | Customer or backend ref |
+| `platform` | "AND" for Android |
+| `fcm_id` | Firebase token |
+| `created_at` / `session_at` | ISO timestamps |
+| `created_by_app` / `session_by_app` | App origin (e.g., KPN_FRESH) |
+| `created_by_user` / `session_by_user` | User metadata |
+| `brand`, `model`, `os_version` etc. | Device info |
+| `user_language`, `user_region` | Locale data |
+| ... and many more |
 
 ---
 
-## 🪵 Logging
+## 🔒 Security Checks & How They Work
 
-- The library uses Ktor with optional logging. To see full request/response logs, make sure to install the Ktor logging plugin in the consuming app (or extend the KtorClient used in the library).
-
----
-
-## 🛠 Internals (How it works)
-
-1. `DeviceInspector.collect(...)` gathers:
-   - Device hardware/software info
-   - Security flags (root, hook, emulator, etc.)
-   - Network info, developer mode, etc.
-
-2. `DeviceRegistrationManager.registerDevice(...)`:
-   - Builds request body from `collect(...)`
-   - Sends API request to your server endpoint via Ktor
-
-3. On success, it returns `DeviceRegisterResponse` (you may log it, store it, or ignore)
+| Check | How it's detected |
+|-------|--------------------|
+| `is_app_tampered` | Verifies app signature vs expected |
+| `is_auto_clicker_enabled` | Detects known auto-clicker APKs |
+| `is_debugging_enabled` | `Settings.Global.ADB_ENABLED` |
+| `is_hooking` | Detects Frida/Substrate hooks |
+| `is_emulator` | Checks build props, telephony |
+| `is_jail_broken` | Looks for root binaries |
+| `is_running_clone_app` | Checks dual app environment |
+| `is_running_gps_spoofer` | Uses `isFromMockProvider` |
+| `is_virtual_os` | VMWare/VirtualBox props |
+| `is_secondary_user` | Multi-user mode check |
+| `is_suspicious_factory_reset` | Factory reset history |
+| ... and more |
 
 ---
 
-## ⚠️ Tips
+## 📁 Folder Structure
 
-- Always send a valid JWT token in the `Authorization: Bearer ...` header.
-- Your app's SHA-256 signature must be passed to validate tampering.
-- Use `UUID.randomUUID().toString()` for guest users.
-- Use `Instant.now().toString()` or an ISO date formatter for `created_at` and `session_at`.
+```
+com.kpn.deviceinspector
+│
+├── data/                    # Ktor DTO models
+│   ├── DeviceRegisterRequest.kt
+│   └── DeviceRegisterResponse.kt
+│
+├── network/                # Ktor client
+│   └── KtorClientProvider.kt
+│
+├── util/                   # Detection utilities
+│   ├── AppSignature.kt
+│   ├── AutoClickerUtil.kt
+│   ├── EmulatorCheckUtil.kt
+│   ├── GpsSpooferDetector.kt
+│   ├── RootDetection.kt
+│   ├── TamperCheckUtil.kt
+│   └── UserAgentUtil.kt
+│
+└── DeviceInspector.kt      # Collects all device metadata
+└── DeviceRegistrationManager.kt  # Final API manager
+```
 
 ---
 
-## 🔒 Why This Library?
+## 📝 Best Practices
 
-This library ensures secure, consistent, and tamper-proof device metadata collection for:
-- Device binding and fraud prevention
-- Multi-device login detection
-- Debug vs Production monitoring
-- Emulator and automation abuse detection
+- Always call `registerDevice()` after login or on launch
+- Save the `device_id` locally
+- Pass SHA-256 of your app for tamper verification
+- Ensure your backend expects and logs this metadata
 
 ---
 
 ## 📄 License
 
-MIT License. Free to use with attribution to [@kotalSumitKPN](https://github.com/kotalSumitKPN)
+MIT License — © [@kotalSumitKPN](https://github.com/kotalSumitKPN)
