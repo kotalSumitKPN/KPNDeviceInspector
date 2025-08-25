@@ -10,7 +10,7 @@ import io.ktor.http.*
 object DeviceApi {
 
     private const val DEVICE_API_URL =
-        "https://api-staging.kpnfarmfresh.com/s/accounts/api/v1/devices?channel=AND"
+        "https://api-staging.kpnfarmfresh.com/s/command-center/api/v1/devices?channel=AND"
 
     suspend fun registerDevice(token: String, deviceInfo: DeviceRegisterRequest): DeviceRegisterResponse? {
         return try {
