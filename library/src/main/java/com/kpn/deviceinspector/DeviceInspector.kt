@@ -31,15 +31,9 @@ object DeviceInspector {
         context: Context,
         anonymousUserId: String,
         userId: String,
-        customerId: String,
         deviceId: String?,
         fcmId: String,
-        createdAt: String,
         createdByApp: String,
-        createdByUser: String,
-        sessionAt: String,
-        sessionByApp: String,
-        sessionByUser: String,
         expectedSignatureSha256: String
     ): DeviceRegisterRequest {
 
@@ -50,12 +44,11 @@ object DeviceInspector {
             anonymous_user_id = anonymousUserId,
             user_id = userId,
             device_id = deviceId ?: "",
-            customer_id = customerId,
+            customer_id = userId,
             platform = "AND",
             fcm_id = fcmId,
-            created_at = createdAt,
             created_by_app = createdByApp,
-            created_by_user = createdByUser,
+            created_by_user = userId,
             brand = Build.BRAND,
             model = Build.MODEL,
             device_type = DeviceTypeUtil.getDeviceType(context),
@@ -63,15 +56,19 @@ object DeviceInspector {
             hardware = Build.HARDWARE,
             board = Build.BOARD,
             android_id = try {
-            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-        } catch (e: Exception) {
-            "unknown"
-        },
+                Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+            } catch (e: Exception) {
+                "unknown"
+            },
             display_type = Build.DISPLAY,
             screen_size = screenSize,
             app_bundle_name = context.packageName,
             os_version = "Android ${Build.VERSION.RELEASE}",
-            security_patch = Build.VERSION.SECURITY_PATCH ?: "",
+            security_patch = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Build.VERSION.SECURITY_PATCH ?: ""
+            } else {
+                "unknown"
+            },
             carrier = CarrierUtil.getCarrierName(context),
             android_build = Build.ID,
             user_agent = System.getProperty("http.agent") ?: "",
@@ -94,12 +91,11 @@ object DeviceInspector {
             is_running_screen_sharing = ScreenSharingDetector.isScreenSharingActive(context),
             is_running_vpn_spoofers = VpnSpooferDetector.isVpnActive(context),
             is_secondary_user = SecondaryUserDetector.isSecondaryUser(),
-            is_suspicious_factory_reset = FactoryResetDetector.isRecentlyFactoryReset(), // Just checks if device restarted and if less than 24 hours takes as recent
+            is_suspicious_factory_reset = FactoryResetDetector.isSuspiciousFactoryReset(context), // Just checks if device restarted and if less than 24 hours takes as recent
             is_virtual_os = VirtualOsDetector.isRunningInVirtualOs(),
             is_request_payload_tampered = PayloadTamperDetector.isPayloadTampered(),
-            session_at = sessionAt,
-            session_by_app = sessionByApp,
-            session_by_user = sessionByUser
+            session_by_app = createdByApp,
+            session_by_user = userId
         )
     }
 }

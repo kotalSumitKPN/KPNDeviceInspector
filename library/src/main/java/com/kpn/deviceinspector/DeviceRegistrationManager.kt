@@ -11,15 +11,9 @@ object DeviceRegistrationManager {
         token: String,
         anonymousUserId: String,
         userId: String,
-        customerId: String,
         deviceId: String?,
         fcmId: String,
-        createdAt: String,
         createdByApp: String,
-        createdByUser: String,
-        sessionAt: String,
-        sessionByApp: String,
-        sessionByUser: String,
         expectedSignatureSha256: String
     ): DeviceRegisterResponse? {
         val deviceInfo = DeviceInspector.collect(
@@ -28,14 +22,8 @@ object DeviceRegistrationManager {
             userId = userId,
             deviceId = deviceId ?: "",
             fcmId = fcmId,
-            createdAt = createdAt,
             createdByApp = createdByApp,
-            createdByUser = createdByUser,
-            sessionAt = sessionAt,
-            sessionByApp = sessionByApp,
-            sessionByUser = sessionByUser,
             expectedSignatureSha256 = expectedSignatureSha256,
-            customerId = customerId
         )
 
         val modifiedDeviceInfo = if (deviceId.isNullOrBlank()) {
@@ -43,8 +31,6 @@ object DeviceRegistrationManager {
         } else {
             deviceInfo
         }
-
-        println("Modified Device Info: $modifiedDeviceInfo")
 
         return DeviceApi.registerDevice(token, modifiedDeviceInfo)
     }
@@ -56,14 +42,8 @@ object DeviceRegistrationManager {
         userId: String,
         deviceId: String?,
         fcmId: String,
-        createdAt: String,
         createdByApp: String,
-        createdByUser: String,
-        sessionAt: String,
-        sessionByApp: String,
-        sessionByUser: String,
         expectedSignatureSha256: String,
-        customerId: String,
         onNewDeviceId: (String) -> Unit
     ): DeviceRegisterResponse? {
         val response = registerDevice(
@@ -73,14 +53,8 @@ object DeviceRegistrationManager {
             userId = userId,
             deviceId = deviceId,
             fcmId = fcmId,
-            createdAt = createdAt,
             createdByApp = createdByApp,
-            createdByUser = createdByUser,
-            sessionAt = sessionAt,
-            sessionByApp = sessionByApp,
-            sessionByUser = sessionByUser,
             expectedSignatureSha256 = expectedSignatureSha256,
-            customerId = customerId
         )
 
         response?.deviceId?.let { newId ->
