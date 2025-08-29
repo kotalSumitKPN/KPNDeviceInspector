@@ -4,9 +4,12 @@
 
 ---
 
-## 🚀 Installation
 
-### Step 1: Add JitPack to your `settings.gradle.kts`
+[![](https://jitpack.io/v/kotalSumitKPN/KPNDeviceInspector.svg)](https://jitpack.io/#kotalSumitKPN/KPNDeviceInspector)
+
+### Installation
+
+### Step 1: Add JitPack to your root `settings.gradle` or `settings.gradle.kts`
 ```kotlin
 pluginManagement {
     repositories {
@@ -28,14 +31,15 @@ dependencyResolutionManagement {
 
 ### Step 2: Add library dependency to your `build.gradle.kts`
 ```kotlin
+// Replace <latest-version> with the version shown on the badge or JitPack
 dependencies {
-    implementation("com.github.kotalSumitKPN:KPNDeviceInspector:v1.0.0")
+    implementation("com.github.kotalSumitKPN:KPNDeviceInspector:<latest-version>")
 }
 ```
 
 ---
 
-## 📦 App-Side Usage
+## App-Side Usage
 
 ### Direct call (returns response):
 
@@ -88,7 +92,7 @@ fun registerDevice() {
 
 ---
 
-## 🔁 API Response
+## API Response
 
 The library returns:
 
@@ -102,7 +106,7 @@ This `device_id` must be saved and reused for future sessions.
 
 ---
 
-## 📘 DeviceRegisterRequest – Field-by-Field
+## DeviceRegisterRequest – Field-by-Field
 
 | Field | Description |
 |-------|-------------|
@@ -121,7 +125,7 @@ This `device_id` must be saved and reused for future sessions.
 
 ---
 
-## 🔒 Security Checks & How They Work
+## Security Checks & How They Work
 
 | Check | How it's detected |
 |-------|--------------------|
@@ -167,7 +171,7 @@ com.kpn.deviceinspector
 
 ---
 
-## 📝 Best Practices
+## Best Practices
 
 - Always call `registerDevice()` after login or on launch
 - Save the `device_id` locally
@@ -176,6 +180,6 @@ com.kpn.deviceinspector
 
 ---
 
-## 📄 License
+## License
 
 MIT License — © [@kotalSumitKPN](https://github.com/kotalSumitKPN)
