@@ -28,7 +28,7 @@ data class DeviceRegisterRequest(
     val carrier: String,
     val android_build: String,
     val user_agent: String,
-    val java_version: String,
+    val java_version: String = System.getProperty("java.version", "") ?: "17",
     val user_language: String,
     val user_region: String,
     val wifi_enabled: Boolean,
