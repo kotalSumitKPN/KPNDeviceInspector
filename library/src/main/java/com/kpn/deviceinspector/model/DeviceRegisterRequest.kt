@@ -1,4 +1,4 @@
-package com.kpn.deviceinspector.model
+package com.kpn.store.deviceinspector.model
 
 import kotlinx.serialization.Serializable
 
@@ -10,7 +10,7 @@ data class DeviceRegisterRequest(
     val customer_id: String,
     val platform: String,
     val fcm_id: String,
-    val created_at: String,
+    val created_at: String? = null,
     val created_by_app: String, // KPARTNER, KSTORE, KOPS, KRIDER
     val created_by_user: String,
     val brand: String,
@@ -50,7 +50,7 @@ data class DeviceRegisterRequest(
     val is_suspicious_factory_reset: Boolean,
     val is_virtual_os: Boolean,
     val is_request_payload_tampered: Boolean,
-    val session_at: String,
+    val session_at: String? = null,
     val session_by_app: String, // KPARTNER, KSTORE, KOPS, KRIDER
     val session_by_user: String
 )

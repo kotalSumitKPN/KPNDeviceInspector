@@ -2,8 +2,7 @@ package com.kpn.deviceinspector
 
 import android.content.Context
 import android.os.Build
-import android.provider.Settings
-import com.kpn.deviceinspector.model.DeviceRegisterRequest
+import com.kpn.deviceinspector.util.AppSetIdProvider
 import com.kpn.deviceinspector.util.AutoClickerDetector
 import com.kpn.deviceinspector.util.BatteryUtil
 import com.kpn.deviceinspector.util.CarrierUtil
@@ -23,11 +22,12 @@ import com.kpn.deviceinspector.util.SecondaryUserDetector
 import com.kpn.deviceinspector.util.TamperCheckUtil
 import com.kpn.deviceinspector.util.VirtualOsDetector
 import com.kpn.deviceinspector.util.VpnSpooferDetector
+import com.kpn.store.deviceinspector.model.DeviceRegisterRequest
 import java.util.Locale
 
 object DeviceInspector {
 
-    fun collect(
+    suspend fun collect(
         context: Context,
         anonymousUserId: String,
         userId: String,
@@ -55,11 +55,7 @@ object DeviceInspector {
             manufacturer = Build.MANUFACTURER,
             hardware = Build.HARDWARE,
             board = Build.BOARD,
-            android_id = try {
-                Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-            } catch (e: Exception) {
-                "unknown"
-            },
+            android_id = AppSetIdProvider.getDeveloperScopedIdOrPlaceholder(context),
             display_type = Build.DISPLAY,
             screen_size = screenSize,
             app_bundle_name = context.packageName,
@@ -78,7 +74,7 @@ object DeviceInspector {
             wifi_enabled = NetworkUtil.isWifiEnabled(context),
             wifi_ssid = NetworkUtil.getWifiSSID(context),
             battery_level = BatteryUtil.getBatteryLevel(context),
-            is_app_tampered = TamperCheckUtil.isAppTampered(context,expectedSignatureSha256),
+            is_app_tampered = TamperCheckUtil.isAppTampered(context, expectedSignatureSha256),
             is_auto_clicker_enabled = AutoClickerDetector.isAutoClickerInstalled(context),
             is_developer_option_enabled = DeveloperSettingsUtil.isDeveloperOptionsEnabled(context),
             is_debugging_enabled = DeveloperSettingsUtil.isDebuggingEnabled(context),
