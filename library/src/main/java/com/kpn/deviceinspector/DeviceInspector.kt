@@ -2,26 +2,6 @@ package com.kpn.deviceinspector
 
 import android.content.Context
 import android.os.Build
-import com.kpn.deviceinspector.util.AppSetIdProvider
-import com.kpn.deviceinspector.util.AutoClickerDetector
-import com.kpn.deviceinspector.util.BatteryUtil
-import com.kpn.deviceinspector.util.CarrierUtil
-import com.kpn.deviceinspector.util.CloneAppDetector
-import com.kpn.deviceinspector.util.DeveloperSettingsUtil
-import com.kpn.deviceinspector.util.DeviceMaskingDetector
-import com.kpn.deviceinspector.util.DeviceTypeUtil
-import com.kpn.deviceinspector.util.EmulatorChecker
-import com.kpn.deviceinspector.util.FactoryResetDetector
-import com.kpn.deviceinspector.util.GpsSpooferDetector
-import com.kpn.deviceinspector.util.HookingDetector
-import com.kpn.deviceinspector.util.NetworkUtil
-import com.kpn.deviceinspector.util.PayloadTamperDetector
-import com.kpn.deviceinspector.util.RootDetector
-import com.kpn.deviceinspector.util.ScreenSharingDetector
-import com.kpn.deviceinspector.util.SecondaryUserDetector
-import com.kpn.deviceinspector.util.TamperCheckUtil
-import com.kpn.deviceinspector.util.VirtualOsDetector
-import com.kpn.deviceinspector.util.VpnSpooferDetector
 import com.kpn.store.deviceinspector.model.DeviceRegisterRequest
 import java.util.Locale
 
