@@ -1,4 +1,4 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.os.Build
 import android.util.Log
@@ -23,11 +23,12 @@ object VirtualOsDetector {
             val result = suspectedTerms.any { indicators.contains(it) }
 
             if (result) {
-                Log.e("VirtualOsDetector", "Virtual OS environment detected")
+                DeviceInfoLogger.log("VirtualOsDetector","Virtual OS environment detected")
             }
 
             result
         } catch (e: Exception) {
+            DeviceInfoLogger.recordError(e,"Error detecting virtual OS environment")
             false
         }
     }

@@ -1,6 +1,8 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.util.Log
+import java.io.BufferedReader
+import java.io.FileReader
 
 object HookingDetector {
 
@@ -18,13 +20,15 @@ object HookingDetector {
             classes.any {
                 try {
                     Class.forName(it)
-                    Log.e("HookingDetector", "Hooking class detected: $it")
+                    DeviceInfoLogger.log("HookingDetector","Hooking class detected: $it")
                     true
-                } catch (_: ClassNotFoundException) {
+                } catch (e: ClassNotFoundException) {
+                    DeviceInfoLogger.recordError(e,"Hooking Class not detected")
                     false
                 }
             }
         } catch (e: Exception) {
+            DeviceInfoLogger.recordError(e,"Hooking class not found")
             false
         }
     }
@@ -32,18 +36,19 @@ object HookingDetector {
     private fun hasFridaMemoryMap(): Boolean {
         return try {
             val maps = StringBuilder()
-            val reader = java.io.BufferedReader(java.io.FileReader("/proc/self/maps"))
+            val reader = BufferedReader(FileReader("/proc/self/maps"))
             var line: String?
 
             while (reader.readLine().also { line = it } != null) {
                 maps.append(line)
                 if (line!!.contains("frida") || line!!.contains("gadget")) {
-                    Log.e("HookingDetector", "Found hooking memory map: $line")
+                    DeviceInfoLogger.log("HookingDetector", "Found hooking memory map: $line")
                     return true
                 }
             }
             false
         } catch (e: Exception) {
+            DeviceInfoLogger.recordError(e,"Error detecting Frida")
             false
         }
     }

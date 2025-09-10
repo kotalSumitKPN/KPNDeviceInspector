@@ -1,4 +1,4 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.content.Context
 import android.location.Location
@@ -18,6 +18,7 @@ object GpsSpooferDetector {
                 val lastKnownLocation: Location? = try {
                     locationManager.getLastKnownLocation(provider)
                 } catch (e: SecurityException) {
+                    DeviceInfoLogger.recordError(e, "Error getting last known location")
                     null
                 }
 
@@ -29,14 +30,13 @@ object GpsSpooferDetector {
                     }
 
                     if (isMock) {
-                        Log.e("GpsSpooferDetector", "Mock location detected from $provider")
                         return true
                     }
                 }
             }
             isAllowMockLocationEnabled(context)
         } catch (e: Exception) {
-            Log.e("GpsSpooferDetector", "Error detecting mock location: ${e.message}")
+            DeviceInfoLogger.recordError(e, "Error detecting mock location")
             false
         }
     }
@@ -46,6 +46,7 @@ object GpsSpooferDetector {
         return try {
             Settings.Secure.getInt(context.contentResolver, Settings.Secure.ALLOW_MOCK_LOCATION) != 0
         } catch (e: Exception) {
+            DeviceInfoLogger.recordError(e, "Error checking allow mock location")
             false
         }
     }

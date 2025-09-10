@@ -1,4 +1,4 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.content.Context
 import android.util.Log
@@ -17,10 +17,13 @@ object AppSetIdProvider {
     suspend fun getDeveloperScopedIdOrPlaceholder(context: Context): String {
         return try {
             val info = AppSet.getClient(context).appSetIdInfo.await()
-            Log.d(TAG, "AppSet scope=${info.scope} (2=DEVELOPER, 1=APP)")
+            DeviceInfoLogger.log(TAG, "AppSet scope=${info.scope} (2=DEVELOPER, 1=APP)")
             if (info.scope == AppSetIdInfo.SCOPE_DEVELOPER) info.id else PLACEHOLDER
         } catch (t: Throwable) {
-            Log.w(TAG, "AppSet unavailable: ${t.message}")
+            DeviceInfoLogger.recordError(
+                t,
+                "AppSet unavailable"
+            )
             PLACEHOLDER
         }
     }

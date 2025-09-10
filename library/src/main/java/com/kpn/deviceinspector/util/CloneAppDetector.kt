@@ -1,4 +1,4 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.content.Context
 import android.os.Process
@@ -15,13 +15,10 @@ object CloneAppDetector {
             val isUserIdHigh = Process.myUid() / 100000 >= 999
             val isPackageInWeirdPath = dataDir.contains("dual") || dataDir.contains("clone")
 
-            if (isDataDirCloned || isUserIdHigh || isPackageInWeirdPath) {
-                Log.e("CloneAppDetector", "Clone app environment detected.")
-                true
-            } else false
+            isDataDirCloned || isUserIdHigh || isPackageInWeirdPath
 
         } catch (e: Exception) {
-            Log.e("CloneAppDetector", "Error detecting clone app: ${e.message}")
+            DeviceInfoLogger.recordError(e, "Error detecting clone app")
             false
         }
     }

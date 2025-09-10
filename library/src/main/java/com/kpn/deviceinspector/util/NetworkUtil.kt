@@ -1,8 +1,7 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.content.Context
 import android.net.wifi.WifiManager
-import android.os.Build
 import android.util.Log
 
 object NetworkUtil {
@@ -19,10 +18,10 @@ object NetworkUtil {
             val ssid = wifiManager.connectionInfo.ssid
             if (ssid == "<unknown ssid>") "" else ssid.removePrefix("\"").removeSuffix("\"")
         } catch (e: SecurityException) {
-            Log.e("NetworkUtil", "Missing location permission to read Wi-Fi SSID")
+            DeviceInfoLogger.recordError(e,"Missing location permission to read Wi-Fi SSID")
             ""
         } catch (e: Exception) {
-            Log.e("NetworkUtil", "Error getting Wi-Fi SSID: ${e.localizedMessage}")
+            DeviceInfoLogger.recordError(e,"Error getting Wi-Fi SSID")
             ""
         }
     }

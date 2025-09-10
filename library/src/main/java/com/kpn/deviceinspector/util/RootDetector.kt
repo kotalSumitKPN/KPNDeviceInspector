@@ -1,4 +1,4 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.os.Build
 import java.io.File
@@ -34,6 +34,7 @@ object RootDetector {
             val process = Runtime.getRuntime().exec(arrayOf("/system/xbin/which", "su"))
             process.inputStream.bufferedReader().readLine() != null
         } catch (e: Exception) {
+            DeviceInfoLogger.recordError(e,"Error checking su path")
             false
         }
     }

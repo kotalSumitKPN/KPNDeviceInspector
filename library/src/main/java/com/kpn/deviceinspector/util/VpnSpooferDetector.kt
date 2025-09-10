@@ -1,9 +1,8 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import android.util.Log
 
 object VpnSpooferDetector {
@@ -17,11 +16,11 @@ object VpnSpooferDetector {
             val isVpn = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
 
             if (isVpn) {
-                Log.e("VpnSpooferDetector", "VPN connection detected")
+                DeviceInfoLogger.log("VpnSpooferDetector","VPN connection detected")
             }
             isVpn
         } catch (e: Exception) {
-            Log.e("VpnSpooferDetector", "Error detecting VPN: ${e.message}")
+            DeviceInfoLogger.recordError(e,"Error detecting VPN")
             false
         }
     }

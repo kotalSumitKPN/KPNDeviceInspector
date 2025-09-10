@@ -1,4 +1,4 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.os.Build
 import android.util.Log
@@ -8,7 +8,6 @@ object PayloadTamperDetector {
     fun isPayloadTampered(): Boolean {
         return try {
             if (HookingDetector.isHookingDetected()) {
-                Log.e("PayloadTamperDetector", "Detected active hooking tools (Frida/Xposed)")
                 return true
             }
 
@@ -21,13 +20,11 @@ object PayloadTamperDetector {
             ).any { it.isNullOrBlank() || it.lowercase() in listOf("unknown", "android", "generic") }
 
             if (suspiciousFields) {
-                Log.e("PayloadTamperDetector", "Detected modified or masked device identifiers")
                 return true
             }
-
             false
         } catch (e: Exception) {
-            Log.e("PayloadTamperDetector", "Error in payload tamper detection: ${e.message}")
+            DeviceInfoLogger.recordError(e,"Error in payload tamper detection")
             false
         }
     }

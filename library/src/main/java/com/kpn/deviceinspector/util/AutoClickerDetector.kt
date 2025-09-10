@@ -1,4 +1,4 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -21,6 +21,10 @@ object AutoClickerDetector {
                 pm.getPackageInfo(packageName, 0)
                 true
             } catch (e: PackageManager.NameNotFoundException) {
+                DeviceInfoLogger.recordError(
+                    e,
+                    "AutoClickerDetector: Package $packageName not found"
+                )
                 false
             }
         }

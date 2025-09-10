@@ -1,8 +1,7 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.content.Context
 import android.hardware.display.DisplayManager
-import android.os.Build
 import android.util.Log
 
 object ScreenSharingDetector {
@@ -17,13 +16,13 @@ object ScreenSharingDetector {
             }
 
             if (virtualDisplays.isNotEmpty()) {
-                Log.e("ScreenSharingDetector", "Virtual display(s) active: ${virtualDisplays.map { it.name }}")
+                DeviceInfoLogger.log("ScreenSharingDetector","Virtual display(s) active: ${virtualDisplays.map { it.name }}")
                 true
             } else {
                 false
             }
         } catch (e: Exception) {
-            Log.e("ScreenSharingDetector", "Error detecting screen sharing: ${e.message}")
+            DeviceInfoLogger.recordError(e,"Error detecting screen sharing")
             false
         }
     }

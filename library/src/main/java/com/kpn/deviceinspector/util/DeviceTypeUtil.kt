@@ -1,9 +1,7 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.util.DisplayMetrics
-import android.view.WindowManager
 import kotlin.math.sqrt
 
 object DeviceTypeUtil {

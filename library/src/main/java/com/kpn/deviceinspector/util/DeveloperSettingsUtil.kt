@@ -1,8 +1,7 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
-import android.os.Build
 import android.provider.Settings
 
 object DeveloperSettingsUtil {
@@ -14,6 +13,7 @@ object DeveloperSettingsUtil {
                 Settings.Global.DEVELOPMENT_SETTINGS_ENABLED
             ) == 1
         } catch (e: Settings.SettingNotFoundException) {
+            DeviceInfoLogger.recordError(e,"Settings not found")
             false
         }
     }

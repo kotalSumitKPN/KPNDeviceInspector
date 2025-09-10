@@ -1,8 +1,7 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.SystemClock
 import android.provider.Settings
 import android.util.Log
@@ -19,7 +18,7 @@ object FactoryResetDetector {
     @Volatile
     private var hasBeenChecked = false
 
-    suspend fun isSuspiciousFactoryReset(context: Context): Boolean {
+    fun isSuspiciousFactoryReset(context: Context): Boolean {
         if (hasBeenChecked) return false
         hasBeenChecked = true
 
@@ -43,6 +42,7 @@ object FactoryResetDetector {
 
             timeSinceBootHours < thresholdInHours
         } catch (e: Exception) {
+            DeviceInfoLogger.recordError(e,"Error getting device uptime")
             false
         }
     }
@@ -56,6 +56,7 @@ object FactoryResetDetector {
 
             diffHours < thresholdInHours
         } catch (e: PackageManager.NameNotFoundException) {
+            DeviceInfoLogger.recordError(e,"Error getting app install time")
             false
         }
     }
@@ -70,6 +71,7 @@ object FactoryResetDetector {
                 false
             }
         } catch (e: Exception) {
+            DeviceInfoLogger.recordError(e,"Error checking marker file")
             true
         }
     }
@@ -89,6 +91,7 @@ object FactoryResetDetector {
                 androidIdHash != storedHash
             }
         } catch (e: Exception) {
+            DeviceInfoLogger.recordError(e,"Error checking Android ID hash")
             false
         }
     }

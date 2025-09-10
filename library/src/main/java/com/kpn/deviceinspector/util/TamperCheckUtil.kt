@@ -1,4 +1,4 @@
-package com.kpn.deviceinspector.util
+package com.kpn.android.deviceinspector.util
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -28,7 +28,7 @@ object TamperCheckUtil {
 
             val signatureBytes = signatures?.firstOrNull()?.toByteArray()
             if (signatureBytes == null) {
-                Log.e("TamperCheck", "Signature byte array is null")
+                DeviceInfoLogger.log("TamperCheck","Signature byte array is null")
                 false
             } else {
                 val digest = MessageDigest.getInstance("SHA-256")
@@ -36,7 +36,7 @@ object TamperCheckUtil {
                 actualHash != expectedSignatureSha256
             }
         } catch (e: Exception) {
-            Log.e("TamperCheck", "Error checking app signature: ${e.message}")
+            DeviceInfoLogger.recordError(e,"Error checking app signature")
             false
         }
     }
